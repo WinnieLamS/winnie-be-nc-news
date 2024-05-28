@@ -1,8 +1,8 @@
 # Northcoders News API
 
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
-
-
+## instructions
+1. create .env.development and .env.test files (use the example.env as a template) 
+2. use the "npm run setup-dbs" script to create the databases first.
 
 --- 
 
