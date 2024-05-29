@@ -48,8 +48,51 @@ describe("GET endpoints", () => {
         .get("/api")
         .expect(200)
         .then(({body}) => {
-            console.log(body);
             expect(body).toEqual(endpoints);
         });
     });
+});
+
+
+describe("GET articles", () => {
+  test("200: Responds with an article object by specific id", () => {
+    return request(app)
+      .get("/api/articles/3")
+      .expect(200)
+      .then(({ body }) => {
+          expect(body).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            body: expect.any(String),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String)
+        });
+      });
+  });
+
+
+describe("POST endpoints", () => {
+  test("201: Responds with new data", () => {
+    const newDescription = {
+      description: "serves an object of specific article by id",
+      queries: ["article_id"]
+    };
+
+  return request(app)
+    .post("/api")
+    .send(newDescription)
+    .set('Content-Type', 'application/json')
+    .expect(201)
+    .then(({body}) => {
+      expect(body).toMatchObject({
+        description: expect.any(String),
+        queries: expect.any(Array),
+        exampleResponse: expect.any(Object),
+      });
+    });
+  });
+});
 });
