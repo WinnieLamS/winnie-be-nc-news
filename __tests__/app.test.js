@@ -127,3 +127,50 @@ describe("GET /api/articles", () => {
       })
 });
 });
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: Responds with an array of comments for the given article_id", () => {
+    return request(app)
+      .get("/api/articles/3/comments")
+      .expect(200)
+      .then(({ body }) => {
+          expect(body).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: 3
+        });
+      });
+  });
+ 
+ 
+  test("400: Responds with 'Bad Request' for invalid article id", () => {
+    return request(app)
+        .get("/api/articles/not-a-valid-id/comments")
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Bad Request");
+        });
+ });
+ 
+ test("404: Responds with 'Not Found' for non-existent article id", () => {
+    return request(app)
+        .get("/api/articles/999999/comments")
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Not Found");
+        });
+ });
+
+ test("404: Responds with 'Not Found' for non-existent article id", () => {
+    return request(app)
+        .get("/api/articles/3/comment")
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Route Not Found");
+        });
+ });
+ });
+ 
