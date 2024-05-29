@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
 const endpoints = require("../endpoints.json");
+const sorted = require("jest-sorted");
 
 
 afterAll(() => {
@@ -14,7 +15,7 @@ afterAll(() => {
     return seed(data);
   });
 
-  describe("GET topics", () => {
+  describe("GET /api/topics", () => {
     test("200: Responds with an array of topic objects", () => {
       return request(app)
         .get("/api/topics")
@@ -42,7 +43,7 @@ afterAll(() => {
 });
   
 
-describe("GET endpoints", () => {
+describe("GET /api", () => {
     test("200: An object describing all the available endpoints on API", () => {
       return request(app)
         .get("/api")
@@ -54,16 +55,16 @@ describe("GET endpoints", () => {
 });
 
 
-describe("GET articles", () => {
-  test("200: Responds with an article object by specific id", () => {
+describe("GET /api/articles/:article_id", () => {
+  test("200: Responds with an acorrect object by specific id", () => {
     return request(app)
       .get("/api/articles/3")
       .expect(200)
       .then(({ body }) => {
           expect(body).toMatchObject({
+            article_id: 3,
             author: expect.any(String),
             title: expect.any(String),
-            article_id: expect.any(Number),
             body: expect.any(String),
             topic: expect.any(String),
             created_at: expect.any(String),
@@ -73,26 +74,56 @@ describe("GET articles", () => {
       });
   });
 
+  test("400: Responds with 'Bad Request' for invalid article id", () => {
+    return request(app)
+        .get("/api/articles/not-a-valid-id")
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Bad Request");
+        });
+});
 
-describe("POST endpoints", () => {
-  test("201: Responds with new data", () => {
-    const newDescription = {
-      description: "serves an object of specific article by id",
-      queries: ["article_id"]
-    };
+test("404: Responds with 'Not Found' for non-existent article id", () => {
+    return request(app)
+        .get("/api/articles/999999")
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Not Found");
+        });
+});
+});
 
-  return request(app)
-    .post("/api")
-    .send(newDescription)
-    .set('Content-Type', 'application/json')
-    .expect(201)
-    .then(({body}) => {
-      expect(body).toMatchObject({
-        description: expect.any(String),
-        queries: expect.any(Array),
-        exampleResponse: expect.any(Object),
+
+describe("GET /api/articles", () => {
+  test("200: Responds with an array of article objects", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body;
+        expect(articles).toBeSortedBy("created_at", {descending: true});
+        expect(articles).toHaveLength(13); 
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number)
+          });
+        });
       });
-    });
   });
+
+  test("400: Responds with 'Bad Request' for invalid endpoind", () => {
+    return request(app)
+        .get("/api/article")
+        .expect(404)
+        .then(({body}) => {
+          expect(body.msg).toBe("Route Not Found")
+      })
 });
 });
