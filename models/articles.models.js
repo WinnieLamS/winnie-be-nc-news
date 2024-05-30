@@ -30,6 +30,7 @@ exports.selectArticles = () => {
     GROUP BY articles.article_id
     ORDER BY articles.created_at DESC
     ;`)
+    
     .then(({rows}) => {
         
         return rows;
@@ -56,10 +57,6 @@ exports.updateArticleById = (inc_votes, article_id) => {
     WHERE article_id = $2 
     RETURNING *;`, [inc_votes, article_id])
     .then(({rows}) => {
-  
-        if (rows.length === 0){
-            return Promise.reject({status: 404, msg: "This article ID does not exist." })
-        }
         return rows[0];
     })
 }
