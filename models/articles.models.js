@@ -43,7 +43,7 @@ exports.checkArticleExists = (id) => {
     WHERE article_id = $1;`, [id])
     .then(({rows}) => {
         if (!rows.length){
-            return Promise.reject({status: 404, msg: "Not Found" })
+            return Promise.reject({status: 404, msg: "This article ID does not exist." })
         }
     })
 }
@@ -58,7 +58,7 @@ exports.updateArticleById = (inc_votes, article_id) => {
     .then(({rows}) => {
   
         if (rows.length === 0){
-            return Promise.reject({status: 404, msg: "Not Found" })
+            return Promise.reject({status: 404, msg: "This article ID does not exist." })
         }
         return rows[0];
     })

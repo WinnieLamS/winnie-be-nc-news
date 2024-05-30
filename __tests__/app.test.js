@@ -161,7 +161,7 @@ describe("GET /api/articles/:article_id/comments", () => {
         .get("/api/articles/999999/comments")
         .expect(404)
         .then(({ body }) => {
-            expect(body.msg).toBe("Not Found");
+            expect(body.msg).toBe("This article ID does not exist.");
         });
  });
  });
@@ -223,7 +223,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         .send(newCommentData)
         .expect(404)
         .then(({ body }) => {
-            expect(body.msg).toBe("Not Found");
+            expect(body.msg).toBe("This article ID does not exist.");
         });
   });
 });
@@ -263,7 +263,7 @@ describe("PATCH /api/articles/:article_id", () => {
           .send({ inc_votes: 1 })
           .expect(404)
           .then(({ body }) => {
-              expect(body.msg).toBe("Not Found");
+              expect(body.msg).toBe("This article ID does not exist.");
           });
   });
   test("400: Responds with 'Bad Request' for invalid article id", () => {
@@ -274,6 +274,34 @@ describe("PATCH /api/articles/:article_id", () => {
         .then(({ body }) => {
             expect(body.msg).toBe("Bad Request");
         });
-});
+  });
 });
       
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: should return the deleted specific comment by the given comment_id and send no body back", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204)
+      .then(async () => {
+        const targetComment = await db.query("SELECT * FROM comments WHERE comment_id = 1");
+        expect(targetComment.rows).toEqual([]);
+      });
+  });
+  test("400: Responds with 'Bad Request' for invalid comment id", () => {
+    return request(app)
+        .delete("/api/comments/not-a-valid-id")
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Bad Request");
+        });
+  });
+
+  test("404: Responds with 'Not Found' for non-existent comment id", () => {
+    return request(app)
+        .delete("/api/comments/999")
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe("This comment ID does not exist.");
+        });
+  });
+});
