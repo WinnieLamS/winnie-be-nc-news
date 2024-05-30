@@ -88,9 +88,9 @@ test("404: Responds with 'Not Found' for non-existent article id", () => {
         .get("/api/articles/999999")
         .expect(404)
         .then(({ body }) => {
-            expect(body.msg).toBe("Not Found");
+            expect(body.msg).toBe("This article ID does not exist.");
         });
-});
+  });
 });
 
 
@@ -327,4 +327,37 @@ describe("GET /api/users", () => {
   /* not sure I need error test here, 
   because I did an error test above on GET ../topics when endpoint is not exsit. 
   I think it's the same test for this, am I right? */
+});
+
+describe("GET /api/articles", () => {
+  test("200: Responds with an array of article objects filtered by specific topic", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        expect(articles).toBeSortedBy("created_at", {descending: true});
+        expect(articles).toHaveLength(1); 
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number)
+          });
+        });
+      });
+  });
+  test("404: Responds with 'Not Found' for non-existent article id", () => {
+    return request(app)
+        .get("/api/articles?topic=dogs")
+        .expect(404)
+        .then(({ body }) => {
+            expect(body.msg).toBe("This topic does not exist.");
+        });
+  });
 });
