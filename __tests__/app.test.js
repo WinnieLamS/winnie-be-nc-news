@@ -56,7 +56,7 @@ describe("GET /api", () => {
 
 
 describe("GET /api/articles/:article_id", () => {
-  test("200: Responds with an acorrect object by specific id", () => {
+  test("200: Responds with an correct object by specific id", () => {
     return request(app)
       .get("/api/articles/3")
       .expect(200)
@@ -166,7 +166,7 @@ describe("GET /api/articles/:article_id/comments", () => {
  });
  });
 
- describe("POST /api/articles/:article_id/comments", () => {
+describe("POST /api/articles/:article_id/comments", () => {
   test("201: Responds with the posted comment by the given article_id", () => {
     const newCommentData = {
       username: "rogersop",
@@ -227,3 +227,53 @@ describe("GET /api/articles/:article_id/comments", () => {
         });
   });
 });
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("202: Updates the article votes and responds with the updated article", () => {
+    return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: -5 })
+        .expect(202)
+        .then(({ body }) => {
+          expect(body.article).toMatchObject({
+            article_id: 1,
+            author: expect.any(String),
+            title: expect.any(String),
+            body: expect.any(String),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: 95,
+            article_img_url: expect.any(String)
+        });
+      });
+    });
+    test("400: Responds with 'Bad Request' for invalid article id", () => {
+      return request(app)
+          .patch("/api/articles/not-a-valid-id")
+          .send({ inc_votes: 1 })
+          .expect(400)
+          .then(({ body }) => {
+              expect(body.msg).toBe("Bad Request");
+          });
+  });
+
+  test("404: Responds with 'Not Found' for non-existent article id", () => {
+      return request(app)
+          .patch("/api/articles/9999")
+          .send({ inc_votes: 1 })
+          .expect(404)
+          .then(({ body }) => {
+              expect(body.msg).toBe("Not Found");
+          });
+  });
+  test("400: Responds with 'Bad Request' for invalid article id", () => {
+    return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: 'string' })
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Bad Request");
+        });
+});
+});
+      
