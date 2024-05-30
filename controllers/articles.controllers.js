@@ -1,26 +1,41 @@
 const { selectArticleById, selectArticles, updateArticleById, checkArticleExists } = require("../models/articles.models");
+const { checkTopicExists } = require("../models/topics.models")
+
 
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
-    selectArticleById(article_id)
-        .then((article) => {
+
+    const promises = [selectArticleById(article_id)];
+
+    if (article_id){
+        promises.push(checkArticleExists(article_id));
+    }
+
+    Promise.all(promises)
+   
+        .then((resolvedPromises) => {
+            const article = resolvedPromises[0];
             res.status(200).send({article});
         })
-        .catch((err) => {
-            next(err);
-        });
+        .catch(next)
 };
 
 exports.getArticles = (req, res, next) => {
-    selectArticles()
-        .then((articles) => {
-            
-            res.status(200).send({articles});
+    const { topic } = req.query;
+
+    const promises = [selectArticles({ topic })];
+
+    if (topic) {
+        promises.push(checkTopicExists(topic));
+    }
+
+    Promise.all(promises)
+        .then(([articles]) => {
+            res.status(200).send({ articles });
         })
-        .catch((err) => {
-            next(err);
-        });
+        .catch(next);
 };
+
 
 exports.patchArticleById = (req, res, next) => {
     const { article_id } = req.params;
