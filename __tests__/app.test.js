@@ -69,7 +69,8 @@ describe("GET /api/articles/:article_id", () => {
             topic: expect.any(String),
             created_at: expect.any(String),
             votes: expect.any(Number),
-            article_img_url: expect.any(String)
+            article_img_url: expect.any(String),
+            comment_count: 2
         });
       });
   });
@@ -83,9 +84,9 @@ describe("GET /api/articles/:article_id", () => {
         });
 });
 
-test("404: Responds with 'Not Found' for non-existent article id", () => {
+test("404: Responds with 'This article ID does not exist' for non-existent article id", () => {
     return request(app)
-        .get("/api/articles/999999")
+        .get("/api/articles/999")
         .expect(404)
         .then(({ body }) => {
             expect(body.msg).toBe("This article ID does not exist.");
@@ -156,9 +157,9 @@ describe("GET /api/articles/:article_id/comments", () => {
         });
  });
  
- test("404: Responds with 'Not Found' for non-existent article id", () => {
+ test("404: Responds with 'This article ID does not exist' for non-existent article id", () => {
     return request(app)
-        .get("/api/articles/999999/comments")
+        .get("/api/articles/999/comments")
         .expect(404)
         .then(({ body }) => {
             expect(body.msg).toBe("This article ID does not exist.");
@@ -213,7 +214,7 @@ describe("POST /api/articles/:article_id/comments", () => {
             expect(body.msg).toBe("Bad Request");
         });
 });
-  test("404: Responds with 'Not Found' for non-existent article id", () => {
+  test("404: Responds with 'This article ID does not exist.' for non-existent article id", () => {
     const newCommentData = {
         username: "rogersop",
         body: "What a lovely day!"
@@ -258,7 +259,7 @@ describe("PATCH /api/articles/:article_id", () => {
           });
   });
 
-  test("404: Responds with 'Not Found' for non-existent article id", () => {
+  test("404: Responds with 'This article ID does not exist' for non-existent article id", () => {
       return request(app)
           .patch("/api/articles/9999")
           .send({ inc_votes: 5 })
@@ -297,7 +298,7 @@ describe("DELETE /api/comments/:comment_id", () => {
         });
   });
 
-  test("404: Responds with 'Not Found' for non-existent comment id", () => {
+  test("404: Responds with 'This comment ID does not exist.' for non-existent comment id", () => {
     return request(app)
         .delete("/api/comments/999")
         .expect(404)
@@ -324,9 +325,6 @@ describe("GET /api/users", () => {
         });
       });
   });
-  /* not sure I need error test here, 
-  because I did an error test above on GET ../topics when endpoint is not exsit. 
-  I think it's the same test for this, am I right? */
 });
 
 describe("GET /api/articles", () => {
@@ -352,7 +350,7 @@ describe("GET /api/articles", () => {
         });
       });
   });
-  test("404: Responds with 'Not Found' for non-existent article id", () => {
+  test("404: Responds with 'This topic does not exist' for non-existent topic", () => {
     return request(app)
         .get("/api/articles?topic=dogs")
         .expect(404)
