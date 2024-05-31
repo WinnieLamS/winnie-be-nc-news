@@ -277,6 +277,15 @@ describe("PATCH /api/articles/:article_id", () => {
             expect(body.msg).toBe("Bad Request");
         });
   });
+  test("400: Responds with 'Bad Request' for invalid article id", () => {
+    return request(app)
+        .patch("/api/articles/1")
+        .send({})
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe("Bad Request");
+        });
+  });
 });
       
 describe("DELETE /api/comments/:comment_id", () => {
@@ -341,13 +350,22 @@ describe("GET /api/articles", () => {
             author: expect.any(String),
             title: expect.any(String),
             article_id: expect.any(Number),
-            topic: expect.any(String),
+            topic: "cats",
             created_at: expect.any(String),
             votes: expect.any(Number),
             article_img_url: expect.any(String),
             comment_count: expect.any(Number)
           });
         });
+      });
+  });
+  test("200: Responds with an array of article objects filtered by specific topic", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        expect(articles).toEqual([]);
       });
   });
   test("404: Responds with 'This topic does not exist' for non-existent topic", () => {

@@ -1,5 +1,5 @@
 const { selectArticleById, selectArticles, updateArticleById, checkArticleExists } = require("../models/articles.models");
-const { checkTopicExists } = require("../models/topics.models")
+const { selectTopics } = require("../models/topics.models")
 
 
 exports.getArticleById = (req, res, next) => {
@@ -26,11 +26,17 @@ exports.getArticles = (req, res, next) => {
     const promises = [selectArticles({ topic })];
 
     if (topic) {
-        promises.push(checkTopicExists(topic));
+        promises.push(selectTopics().then((topics) => {
+            const slugs = topics.map(topic => topic.slug);
+            if (!slugs.includes(topic)) {
+                return Promise.reject({ status: 404, msg: "This topic does not exist." });
+            }
+        }));
     }
 
     Promise.all(promises)
-        .then(([articles]) => {
+        .then((results) => {
+            const articles = results[0];
             res.status(200).send({ articles });
         })
         .catch(next);
