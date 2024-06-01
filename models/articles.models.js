@@ -16,9 +16,10 @@ exports.selectArticleById = (id) => {
 }
 
 
-exports.selectArticles = ({topic}) => {
+exports.selectArticles = ({topic, sort_by, order}) => {
 
     const queryValues = [];
+
 
     let queryStr = `SELECT 
     articles.author, 
@@ -40,7 +41,7 @@ exports.selectArticles = ({topic}) => {
 
     queryStr += `
     GROUP BY articles.article_id
-    ORDER BY articles.created_at DESC `;
+    ORDER BY ${sort_by} ${order.toUpperCase()}`;
 
     return db
     .query(queryStr, queryValues)

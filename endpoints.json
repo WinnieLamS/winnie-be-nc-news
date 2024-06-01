@@ -15,7 +15,7 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles and sorted by date in descending order",
+    "description": "serves an array of all articles",
     "queries": [
       "author",
       "topic",
@@ -84,7 +84,7 @@
     }
   },
   "PATCH /api/articles/:article_id": {
-    "description": "updates the votes of an article by the given article_id",
+    "description": "updates the votes from a specific article by article_id",
     "requests": {
       "inc_votes": 1
     },
@@ -102,7 +102,7 @@
     }
   },
   "DELETE /api/comments/:comment_id": {
-    "description": "deletes the given comment by comment_id",
+    "description": "deletes a specific comment by comment_id",
     "exampleResponse": null
   },
   "GET /api/users": {
