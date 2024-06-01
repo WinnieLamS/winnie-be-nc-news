@@ -21,9 +21,16 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-    const { topic } = req.query;
+    const { topic, sort_by = 'created_at', order = 'desc' } = req.query;
 
-    const promises = [selectArticles({ topic })];
+    const validSortColumns = ['author', 'title', 'article_id', 'topic', 'created_at', 'votes'];
+    const validOrders = ['asc', 'desc'];
+
+    if (!validSortColumns.includes(sort_by) || !validOrders.includes(order)) {
+        return next({ status: 400, msg: "Bad Request" });
+    }
+
+    const promises = [selectArticles({ topic, sort_by, order })];
 
     if (topic) {
         promises.push(selectTopics().then((topics) => {
