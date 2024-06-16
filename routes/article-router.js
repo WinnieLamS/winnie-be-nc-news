@@ -12,7 +12,7 @@ articleRouter.route("/:article_id")
     .get(getArticleById)
     .patch(patchArticleById);
 
-    articleRouter.route("/:article_id/comments")
+articleRouter.route("/:article_id/comments")
     .get(getCommentsById)
     .post(addCommentById);
 

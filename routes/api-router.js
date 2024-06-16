@@ -8,6 +8,7 @@ const articleRouter = require("./article-router");
 const commentRouter = require("./comment-router");
 
 apiRouter.get("/", getEndpoints);
+
 apiRouter.use("/topics", topicRouter);
 apiRouter.use("/users", userRouter);
 apiRouter.use("/articles", articleRouter);
