@@ -392,7 +392,7 @@ describe("GET /api/users", () => {
       .get("/api/users")
       .expect(200)
       .then(({ body }) => {
-        const users = body.users;
+        const users = body.userArr;
         expect(users).toHaveLength(4); 
         users.forEach((user) => {
           expect(user).toMatchObject({
@@ -401,6 +401,68 @@ describe("GET /api/users", () => {
             avatar_url: expect.any(String)
           });
         });
+      });
+  });
+  test("200: Responds with an array of users sorted by valid column", () => {
+    return request(app)
+      .get("/api/users?sort_by=username")
+      .expect(200)
+      .then(({ body }) => {
+        const users = body.userArr;
+        expect(users).toBeSortedBy("username", { descending: true });
+      });
+  });
+
+  test("200: Responds with an array of users sorted by valid column in ascending order", () => {
+    return request(app)
+      .get("/api/users?sort_by=name&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const users = body.userArr;
+        expect(users).toBeSortedBy("name", { ascending: true });
+      });
+  });
+
+  test("400: Responds with 'Bad Request' for invalid sort_by column", () => {
+    return request(app)
+      .get("/api/articles?sort_by=invalid_column")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+
+  test("400: Responds with 'Bad Request' for invalid order value", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title&order=invalid_order")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+});
+
+describe("GET /api/users/:username", () => {
+  test("200: Responds with an user object", () => {
+    return request(app)
+      .get("/api/users/lurker")
+      .expect(200)
+      .then(({ body }) => {
+        const user = body.userArr[0]
+          expect(user).toMatchObject({
+            username: 'lurker',
+            name: 'do_nothing',
+            avatar_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png'
+          });
+      });
+  });
+  
+  test("404: Responds with 'This username does not exist.'", () => {
+    return request(app)
+      .get("/api/users/winnie")
+      .expect(404)
+      .then(({ body }) => {
+          expect(body.msg).toBe("This username does not exist.");
       });
   });
 });
