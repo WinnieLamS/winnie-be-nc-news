@@ -30,7 +30,7 @@ To run this project locally, follow these steps:
 - PostgreSQL v10.0.0 or higher
 
 ## Testing
-To run tests, use the following command: `npm test app`
+To run tests, after `npm install supertest` use the following command: `npm test app`
 
 ## API Documentation
 The API endpoints are documented in the code and can be accessed via the /api endpoint when the server is running. For detailed documentation, please refer to the comments and documentation provided in the codebase.
